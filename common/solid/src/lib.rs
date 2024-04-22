@@ -1,8 +1,6 @@
 #![deny(unsafe_op_in_unsafe_fn)]
 #![feature(const_mut_refs)]
-#![feature(generic_associated_types)]
 #![feature(const_precise_live_drops)]
-#![feature(const_ptr_offset_from)]
 #![feature(const_size_of_val)]
 #![feature(decl_macro)]
 
