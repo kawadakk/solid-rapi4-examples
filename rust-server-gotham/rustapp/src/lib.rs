@@ -1,5 +1,5 @@
 ﻿#![feature(type_alias_impl_trait)]
-#![feature(let_else)]
+#![feature(portable_simd)]
 #![deny(unsafe_op_in_unsafe_fn)]
 
 #[cfg(target_os = "solid_asp3")]
@@ -24,7 +24,7 @@ extern "C" fn slo_main() {
     // Start CPU usage monitor
     #[cfg(target_os = "solid_asp3")]
     cpumon::init();
-    
+
     #[cfg(target_os = "solid_asp3")]
     let num_processors = solid::abi::SOLID_CORE_MAX;
     #[cfg(not(target_os = "solid_asp3"))]
@@ -75,8 +75,6 @@ extern "C" fn slo_main() {
 
     // Start HTTP server
     rt.block_on(server_loop());
-
-    unreachable!();
 }
 
 // ----------------------------------------------------------------------------
@@ -246,8 +244,9 @@ fn render_mandelbrot_set(vp_x: f32, vp_y: f32, vp_r: f32) -> (Vec<u8>, f64) {
 
     use image::ImageEncoder;
     use rayon::prelude::*;
+    use std::simd::{prelude::*, StdFloat as _};
 
-    type F32xN = packed_simd::f32x4;
+    type F32xN = std::simd::f32x4;
 
     let mut imgbuf = image::RgbaImage::new(IMGDIM as u32, IMGDIM as u32);
     let start = std::time::Instant::now();
@@ -259,12 +258,13 @@ fn render_mandelbrot_set(vp_x: f32, vp_y: f32, vp_r: f32) -> (Vec<u8>, f64) {
         let pixel_size_y = pixel_size_x;
 
         // 4x4 uniform sampling
-        let msaa_pattern_x = F32xN::new(-1.5, -0.5, 0.5, 1.5) / 4.0 * pixel_size_x;
+        let msaa_pattern_x =
+            F32xN::from_array([-1.5, -0.5, 0.5, 1.5]) * F32xN::splat(pixel_size_x / 4.0);
         let msaa_pattern: [[F32xN; 2]; 4] = [
-            [msaa_pattern_x, F32xN::splat(-1.5 / 4.0) * pixel_size_y],
-            [msaa_pattern_x, F32xN::splat(-0.5 / 4.0) * pixel_size_y],
-            [msaa_pattern_x, F32xN::splat(0.5 / 4.0) * pixel_size_y],
-            [msaa_pattern_x, F32xN::splat(1.5 / 4.0) * pixel_size_y],
+            [msaa_pattern_x, F32xN::splat(-1.5 / 4.0 * pixel_size_y)],
+            [msaa_pattern_x, F32xN::splat(-0.5 / 4.0 * pixel_size_y)],
+            [msaa_pattern_x, F32xN::splat(0.5 / 4.0 * pixel_size_y)],
+            [msaa_pattern_x, F32xN::splat(1.5 / 4.0 * pixel_size_y)],
         ];
 
         let pix_y = pix_y as f32 * pixel_size_y + (vp_y - vp_r);
@@ -286,14 +286,14 @@ fn render_mandelbrot_set(vp_x: f32, vp_y: f32, vp_r: f32) -> (Vec<u8>, f64) {
                         // z = z² + c
                         z = [
                             // z[0]*z[0] - z[1]*z[1] + c[0]
-                            (-z[1]).mul_adde(z[1], z[0] * z[0]) + c[0],
+                            (-z[1]).mul_add(z[1], z[0] * z[0]) + c[0],
                             // 2*z[0]*z[1] + c[1]
-                            (z[0] * z[1]).mul_adde(F32xN::splat(2.0), c[1]),
+                            (z[0] * z[1]).mul_add(F32xN::splat(2.0), c[1]),
                         ];
 
                         // divergence = |z|² ≥ THRESHOLD
                         divergence_neg =
-                            F32xN::splat(THRESHOLD).gt(z[0].mul_add(z[0], z[1] * z[1]));
+                            F32xN::splat(THRESHOLD).simd_gt(z[0].mul_add(z[0], z[1] * z[1]));
 
                         // if all_simd_lanes(divergence) { break; }
                         if !divergence_neg.any() {
@@ -301,11 +301,11 @@ fn render_mandelbrot_set(vp_x: f32, vp_y: f32, vp_r: f32) -> (Vec<u8>, f64) {
                         }
                     }
 
-                    divergence_neg.bitmask().count_ones()
+                    divergence_neg.to_bitmask().count_ones()
                 })
                 .sum();
 
-            let coverage = coverage as f32 / (F32xN::lanes() * msaa_pattern.len()) as f32;
+            let coverage = coverage as f32 / (F32xN::LEN * msaa_pattern.len()) as f32;
             let luma = ((1.0 - coverage).sqrt() * 255.0) as u8;
             let color = image::Rgba([luma, luma, luma, 255]);
 
