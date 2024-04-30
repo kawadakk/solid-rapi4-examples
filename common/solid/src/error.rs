@@ -29,6 +29,7 @@ impl Error {
     }
 
     #[inline]
+    #[allow(dead_code)]
     pub(crate) fn err_if_negative(x: i32) -> Result<i32, Self> {
         if let Some(x) = Error::from_raw(x) {
             Err(x)
