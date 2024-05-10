@@ -192,7 +192,7 @@ dependencies = [
 
 [[package]]
 name = "bcm2711_pac"
-version = "0.1.0"
+version = "0.0.0"
 dependencies = [
  "macropol",
  "tock-registers",
@@ -761,7 +761,7 @@ dependencies = [
 
 [[package]]
 name = "rustapp"
-version = "0.1.0"
+version = "0.0.0"
 dependencies = [
  "bcm2711_pac",
  "solid",
@@ -837,7 +837,7 @@ checksum = "f67ad224767faa3c7d8b6d91985b78e70a1324408abcb1cfcc2be4c06bc06043"
 
 [[package]]
 name = "solid"
-version = "0.0.1"
+version = "0.0.0"
 dependencies = [
  "autocxx",
  "autocxx-build",

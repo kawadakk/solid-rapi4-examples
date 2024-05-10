@@ -1383,7 +1383,7 @@ dependencies = [
 
 [[package]]
 name = "rustapp"
-version = "0.1.0"
+version = "0.0.0"
 dependencies = [
  "bytes",
  "env_logger 0.9.1",
@@ -1560,7 +1560,7 @@ dependencies = [
 
 [[package]]
 name = "solid"
-version = "0.0.1"
+version = "0.0.0"
 dependencies = [
  "autocxx",
  "autocxx-build",

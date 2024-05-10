@@ -4,7 +4,7 @@ version = 3
 
 [[package]]
 name = "bcm2711_pac"
-version = "0.1.0"
+version = "0.0.0"
 dependencies = [
  "macropol",
  "tock-registers",
@@ -98,7 +98,7 @@ dependencies = [
 
 [[package]]
 name = "rustapp"
-version = "0.1.0"
+version = "0.0.0"
 dependencies = [
  "bcm2711_pac",
  "itron",
