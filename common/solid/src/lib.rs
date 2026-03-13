@@ -1,5 +1,4 @@
 #![deny(unsafe_op_in_unsafe_fn)]
-#![feature(const_mut_refs)]
 #![feature(const_precise_live_drops)]
 #![feature(decl_macro)]
 
