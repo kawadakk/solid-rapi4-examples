@@ -15,6 +15,7 @@
 //! registration ([`Handler::register`]`[_static]`) for that interrupt line.
 use core::{
     cell::UnsafeCell,
+    ffi::c_char,
     pin::Pin,
     ptr::{null_mut, NonNull},
     sync::atomic::{AtomicUsize, Ordering},
@@ -354,8 +355,9 @@ impl<T: HandlerFn> Handler<T> {
 
             // `SOLID_INTC_RegisterWithTargetProcess`'s definition restricts the
             // selectable processors to the first eight ones in the system
-            let processor_set: i8 = u8::try_from(processor_set.as_u32_bits())
-                .map_err(|_| RegisterError::BadParam)? as i8;
+            let processor_set: c_char = u8::try_from(processor_set.as_u32_bits())
+                .map_err(|_| RegisterError::BadParam)?
+                as c_char;
 
             this.inner = abi::SOLID_INTC_HANDLER {
                 intno: intno.0,

@@ -6,7 +6,7 @@ use crate::abi;
 /// Write a single byte to the current log target.
 #[inline]
 pub fn write_byte(b: u8) {
-    unsafe { abi::SOLID_LOG_PutChar(b as i8) };
+    unsafe { abi::SOLID_LOG_PutChar(b as core::ffi::c_char) };
 }
 
 /// Write bytes to the current log target.
