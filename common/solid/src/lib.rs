@@ -1,7 +1,6 @@
 #![deny(unsafe_op_in_unsafe_fn)]
 #![feature(const_mut_refs)]
 #![feature(const_precise_live_drops)]
-#![feature(const_size_of_val)]
 #![feature(decl_macro)]
 
 #[cfg(not(feature = "std"))]
