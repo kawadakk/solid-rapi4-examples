@@ -1,5 +1,4 @@
-﻿#![feature(let_else)] // let pattern = ... else { ... };
-#![feature(solid_ext)] // std::os::solid::prelude::AsRawFd
+﻿#![feature(solid_ext)] // std::os::solid::prelude::AsRawFd
 use std::{
     io::{self, prelude::*},
     net::{Shutdown, TcpListener, TcpStream},
