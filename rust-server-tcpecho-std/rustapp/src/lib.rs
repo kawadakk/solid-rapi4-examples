@@ -63,7 +63,7 @@ struct JobIngress {
 
 /// Identifies a worker. Only used for diagnostic purposes.
 #[derive(Debug, Copy, Clone)]
-struct Worker(usize);
+struct Worker(#[expect(dead_code)] usize);
 
 fn worker_loop(worker: Worker, send_job_ingress: mpsc::SyncSender<JobIngress>) {
     let mut buf = [0u8; 4096];
